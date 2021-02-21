@@ -31,20 +31,54 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     }
     
     @IBAction func didTapTypeSegment(_ sender: UISegmentedControl) {
-        print(sender.selectedSegmentIndex)
+        calendar.reloadData()
     }
     
-    func showTypeSchedule(type: Int) {
-        
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        if daysArr.count > 0 {
-            print(daysArr[0].day)
-            print(daysArr[0].title)
-            print(daysArr[0].type)
+    func showTypeSchedule(type: Int, index: Int, cell: UICollectionViewCell) {
+        switch type {
+        case 0:
+            showSchedule(type: .none, index: index, cell: cell, color: .systemYellow)
+        case 1:
+            showSchedule(type: .hospital, index: index, cell: cell, color: .orange)
+        case 2:
+            showSchedule(type: .bob, index: index, cell: cell, color: .magenta)
+        case 3:
+            showSchedule(type: .med, index: index, cell: cell, color: .systemPink)
+        default:
+            showSchedule(type: .snack, index: index, cell: cell, color: .green)
         }
+    }
+    
+    //보여주는 함수
+    func showSchedule(type: careType, index: Int, cell: UICollectionViewCell, color: UIColor) {
+        for dayData in daysArr {
+            let date = dayData.day
+            let endIdx: String.Index = date.index(date.startIndex, offsetBy: 5)
+            let startIdx: String.Index = date.index(date.startIndex, offsetBy: 6)
+            
+            let ym = String(date[...endIdx]) //202102
+            let d = String(date[startIdx...]) //12
+            
+            if formatterDateFunc() == ym {
+                if Int(d) == Int(days[index]) {
+                    if type == .none {
+                        cell.backgroundColor = color
+                    }
+                    else if type == dayData.type {
+                        cell.backgroundColor = color
+                    }
+                    
+                }
+                
+            }
+            
+        }
+    }
+    
+    //내 생각은 day 배열에 있는 스케줄들의 day 스트링이랑 지금 달이 같으면 ? 뒤에 있는 day 날들이 cell 에 칠해주기
+    override func viewWillAppear(_ animated: Bool) {
         
+        self.calendar.reloadData()
     }
     
     @objc func handleLongPress(longPressGesture: UILongPressGestureRecognizer) {
@@ -59,8 +93,8 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let controller = storyboard.instantiateViewController(withIdentifier: "addSomething") as! AddillViewController
             controller.tempDaySchedule = daySchedule()
-        
-            let selectedDay = formatterDateFunc() + String(indexPath!.row) //yyyyMMdd
+            
+            let selectedDay = formatterDateFunc() +  formatterDayFunc(input: indexPath!.row)//yyyyMMdd
             controller.tempDaySchedule?.day = selectedDay
             //여기서 yyyyMMdd 이렇게 줘야 그렇게 배열에 저장됨
             
@@ -75,6 +109,13 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         formatter.dateFormat = "yyyyMM"
         let currentYM = cal.date(from: components)!
         return formatter.string(from: currentYM)
+    }
+    
+    func formatterDayFunc(input: Int) -> String {
+        if input < 10 {
+            return String(0) + String(input)
+        }
+        return String(input)
     }
     
     private func gestureInit() {
@@ -168,6 +209,10 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         } else {
             cell.dayLabel.textColor = .black
         }
+        cell.backgroundColor = .systemBackground
+        
+    
+        showTypeSchedule(type: typeSegment.selectedSegmentIndex, index: indexPath.row, cell: cell)
         
         return cell
     }
@@ -186,7 +231,14 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let myBoundSize: CGFloat = UIScreen.main.bounds.size.width
         let cellSize = myBoundSize / 9
-        return CGSize(width: cellSize, height: 80)
+
+        switch indexPath.section {
+        case 0:
+            return CGSize(width: cellSize, height: 20)
+        default:
+            return CGSize(width: cellSize, height: 80)
+        }
+        
     }
     
 }

@@ -44,9 +44,9 @@ class AddillViewController: UIViewController {
         case 1:
             tempDaySchedule?.type = .bob
         case 2:
-            tempDaySchedule?.type = .snack
-        case 3:
             tempDaySchedule?.type = .med
+        case 3:
+            tempDaySchedule?.type = .snack
         default:
             tempDaySchedule?.type = .none
         }
