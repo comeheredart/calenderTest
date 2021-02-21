@@ -16,7 +16,19 @@ class AddillViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        dayTitle.text = tempDaySchedule?.day
+        titleTextSetting()
+    }
+    
+    func titleTextSetting() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMMdd"
+        let date = dateFormatter.date(from: tempDaySchedule!.day)
+        print(tempDaySchedule!.day)
+        
+        let printDateFormatter = DateFormatter()
+        printDateFormatter.dateFormat = "yyyy년 MM월 dd일"
+    
+        dayTitle.text = printDateFormatter.string(from: date!)
     }
     
     @IBAction func didTapSubmit(_ sender: Any) {
@@ -46,7 +58,6 @@ class AddillViewController: UIViewController {
         pre.daysArr.append(tempDaySchedule!)
         pre.dismiss(animated: true)
         
-            
     }
     
     

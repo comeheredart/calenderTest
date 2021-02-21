@@ -21,6 +21,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     @IBOutlet weak var calendarHead: UILabel!
     @IBOutlet weak var calendar: UICollectionView!
+    @IBOutlet weak var typeSegment: UISegmentedControl!
     
     
     override func viewDidLoad() {
@@ -29,10 +30,19 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         gestureInit()
     }
     
+    @IBAction func didTapTypeSegment(_ sender: UISegmentedControl) {
+        print(sender.selectedSegmentIndex)
+    }
+    
+    func showTypeSchedule(type: Int) {
+        
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         if daysArr.count > 0 {
             print(daysArr[0].day)
             print(daysArr[0].title)
+            print(daysArr[0].type)
         }
         
     }
@@ -49,11 +59,22 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let controller = storyboard.instantiateViewController(withIdentifier: "addSomething") as! AddillViewController
             controller.tempDaySchedule = daySchedule()
-            controller.tempDaySchedule?.day = days[indexPath!.row] //여기서 yyyyMMdd 이렇게 줘야 그렇게 배열에 저장됨
+        
+            let selectedDay = formatterDateFunc() + String(indexPath!.row) //yyyyMMdd
+            controller.tempDaySchedule?.day = selectedDay
+            //여기서 yyyyMMdd 이렇게 줘야 그렇게 배열에 저장됨
             
             controller.modalPresentationStyle = .fullScreen
             self.present(controller, animated: true, completion: nil)
         }
+    }
+    
+    //yyyyMM 형식 만들어주는 함수
+    func formatterDateFunc() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMM"
+        let currentYM = cal.date(from: components)!
+        return formatter.string(from: currentYM)
     }
     
     private func gestureInit() {
@@ -77,12 +98,11 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         let firstDayOfMonth = cal.date(from: components)
         let firstWeekDay = cal.component(.weekday, from: firstDayOfMonth!)
         daysCountInMonth = cal.range(of: .day, in: .month, for: firstDayOfMonth!)!.count
-        print(weekdayAdding, daysCountInMonth)
+        
         
         weekdayAdding = 2 - firstWeekDay
         
         self.calendarHead.text = dateFormatter.string(from: firstDayOfMonth!)
-        
         self.days.removeAll()
         
         for day in weekdayAdding...daysCountInMonth {
@@ -101,6 +121,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
 
     @IBAction func didTapPreBtn(_ sender: UIButton) {
         components.month = components.month! - 1
+        print(components.month!)
         self.calculation()
         self.calendar.reloadData()
     }
